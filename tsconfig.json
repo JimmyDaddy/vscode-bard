@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "react",
+		"module": "commonjs",
+		"target": "ES2020",
+    "outDir": "./dist",
+		"esModuleInterop": true,
+		"sourceMap": true,
+		"rootDir": "src",
+		"plugins": [{ "name": "typescript-plugin-css-modules" }],
+		"strict": true   /* enable all strict type-checking options */
+		/* Additional Checks */
+		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
+		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
+	}
+}
