@@ -24,14 +24,4 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 * Paste the value in the extension settings `vscode-bard.cookies`.
 * OR use shot cut `ctrl+shift+B` and paste the value.
 
-## Release Notes
-
-### 0.0.1
-
-Initial extension
-
-### 0.0.2
-
-fix dependencies not found error
-
 **Enjoy!**
