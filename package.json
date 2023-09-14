@@ -1,14 +1,19 @@
 {
   "name": "vscode-bard",
   "displayName": "vscode bard",
-  "description": "bard for vscode",
-  "version": "0.0.1",
+  "description": "google bard for vscode",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.82.0"
   },
   "categories": [
+    "Education",
+    "Machine Learning",
+    "Programming Languages",
     "Other"
   ],
+  "pricing": "Free",
+  "icon": "assets/bard.png",
   "publisher": "jimmydaddy",
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -111,17 +116,18 @@
     "@mui/material": "^5.14.8",
     "axios": "^1.5.0",
     "cheerio": "^1.0.0-rc.12",
-    "leoric": "^2.11.2",
-    "memoize-one": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.7",
     "react-virtualized": "^9.22.5",
-    "sqlite3": "^5.1.6",
     "tslog": "^4.9.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/JimmyDaddy/vscode-bard"
+  },
+  "bugs": {
+    "url": "https://github.com/JimmyDaddy/vscode-bard/issues",
+    "email": "heyjimmygo@gmail.com"
   }
 }

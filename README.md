@@ -12,10 +12,6 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 
 * `vscode-bard.cookies`: Your Google Bard cookies.
 
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
 ## How to get cookies?
 
 * Go to https://bard.google.com and login.
@@ -24,8 +20,14 @@ Users appreciate release notes as you update your extension.
 * Paste the value in the extension settings `vscode-bard.cookies`.
 * OR use shot cut `ctrl+shift+B` and paste the value.
 
+## Release Notes
+
 ### 0.0.1
 
 Initial extension
+
+### 0.0.2
+
+fix dependencies not found error
 
 **Enjoy!**
