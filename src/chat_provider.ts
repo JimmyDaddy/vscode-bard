@@ -69,7 +69,7 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
     let srcUrl = '';
     if (isProduction) {
       const filePath = vscode.Uri.file(
-        path.join(this.context.extensionPath, 'dist', 'static/js/main.js')
+        path.join(this.context.extensionPath, 'out/dist', 'static/js/main.js')
       );
       srcUrl = webviewView.webview.asWebviewUri(filePath).toString();
     } else {
