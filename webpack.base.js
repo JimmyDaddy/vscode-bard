@@ -4,12 +4,13 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   entry: path.join(__dirname, './src/view/index.tsx'), // 入口文件
   output: {
     filename: 'static/js/[name].js',
-    path: path.join(__dirname, './dist'),
+    path: path.join(__dirname, './out/dist'),
     clean: true,
     publicPath: '/',
   },
@@ -17,6 +18,7 @@ module.exports = {
     rules: [
       {
         test: /.(ts|tsx)$/, // 匹配.ts, tsx文件
+        exclude: [ /node_modules/ ],
         use: {
           loader: 'babel-loader',
           options: {
@@ -26,6 +28,23 @@ module.exports = {
             ]
           }
         }
+      },
+      {
+        test: /\.less$/i,
+        use: [
+          // compiles Less to CSS
+          "style-loader",
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                auto: /\.module\.less$/,
+                localIdentName: '[name]__[local]-[hash:base64:5]',
+              },
+            },
+          },
+          "less-loader",
+        ],
       },
       {
         test: /\.css$/i,
@@ -42,27 +61,7 @@ module.exports = {
           "postcss-loader"
         ],
       },
-      // {
-      //   test: /\.s[ac]ss$/i,
-      //   use: [
-      //     // Creates `style` nodes from JS strings
-      //     "style-loader",
-      //     // Translates CSS into CommonJS
-      //     "css-loader",
-      //     // Compiles Sass to CSS
-      //     "sass-loader",
-      //   ],
-      // },
-      {
-        test: /\.less$/i,
-        use: [
-          // compiles Less to CSS
-          "style-loader",
-          "css-loader",
-          "less-loader",
-        ],
-      },
-    ]
+    ],
   },
   resolve: {
     extensions: ['.js', '.tsx', '.ts'],
@@ -71,6 +70,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './src/view/index.html'),
       inject: true, // 自动注入静态资源
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:8].css',
+      chunkFilename: '[name].[contenthash:8].chunk.css',
+      ignoreOrder: true,
     }),
   ],
 };

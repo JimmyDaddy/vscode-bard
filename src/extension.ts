@@ -6,7 +6,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("vscode-bard.setCookie", async () => {
       const cookie = await vscode.window.showInputBox({
-        prompt: "Enter your cookie",
+        prompt: "Enter your Google cookies",
       });
 
       if (cookie) {

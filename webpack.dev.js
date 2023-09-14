@@ -9,11 +9,16 @@ module.exports = merge(baseConfig, {
   devtool: 'source-map',
   devServer: {
     port: 3000,
+    host: 'localhost',
     compress: false,
     hot: true,
     historyApiFallback: true,
     static: {
       directory: path.join(__dirname, './src/view/public'),
-    }
+    },
+    allowedHosts: 'all',
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
 });

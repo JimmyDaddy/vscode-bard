@@ -1,23 +1,93 @@
 
 .container {
-  width: 100vw;
+  width: 94vw;
   height: 100vh;
-  border-width: 1px;
-  border-color: black;
 }
 
 .inputContainer {
-  width: 100%;
-  height: 50px;
+  width: 86vw;
+  height: 40px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: #BDBDBD;
+  background-color: #595959;
+  border-radius: 6px;
+  padding: 0px 8px;
+  margin-top: 12px;
 
   .input {
     flex: 1;
-    border-radius: 0px;
+    border-radius: 6px;
+    font-size: small;
   } 
 }
 
+.conversationContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: default;
+}
+
+.contentContainer {
+  text-align: left;
+  border-bottom: #bdbdbd57 solid 1px;
+  width: 100%;
+  padding: 16px 0px;
+  cursor: pointer;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  width: 100%;
+
+  .deleteContainer {
+    flex: 1;
+    text-align: right;
+
+    &.hidden {
+      display: none;
+    }
+  }
+}
+
+.name {
+  margin-left: 8px;
+  font-weight: bold;
+}
+
+.content {
+  margin-top: 16px;
+}
+
+.responseContainer {
+  margin-left: 0px;
+}
+
+.promptSelectContainer {
+  flex: 1;
+  text-align: right;
+}
+
+.promptSelectRoot {
+  svg {
+    color: #bdbdbd57;
+  }
+}
+
+.promptSelect {
+  text-align: right;
+  font-size: small !important;
+  color: #bdbdbd57 !important;
+}
+
+.loading {
+  font-size: 24px;
+}
