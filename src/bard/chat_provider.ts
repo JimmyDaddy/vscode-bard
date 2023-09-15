@@ -7,6 +7,7 @@ import { MSG } from '../isomorphic/consts';
 export default class ChatProvider implements vscode.WebviewViewProvider {
   context: vscode.ExtensionContext;
   private bot: Bard;
+  private webviewView: vscode.WebviewView | undefined;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -22,6 +23,8 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
       enableScripts: true,
       localResourceRoots: [this.context.extensionUri]
     };
+
+    this.webviewView = webviewView;
 
     const isProduction = this.context.extensionMode === vscode.ExtensionMode.Production;
 
@@ -95,6 +98,15 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
     );
   }
 
+  reloadAllData() {
+    if (!this.webviewView || !this.bot) return;
+    this.bot.loadData();
+    const data = this.bot.getConversationData();
+    this.webviewView.webview.postMessage({
+      type: MSG.initData,
+      data: JSON.stringify(data.messages || []),
+    });
+  }
 }
 
 function getWebviewContent(srcUri: string) {

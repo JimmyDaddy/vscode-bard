@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import ChatProvider from "./chat_provider";
 
 export function activate(context: vscode.ExtensionContext) {
+
+  const chatProvider = new ChatProvider(context);
   // 注册 setCookie 命令
   context.subscriptions.push(
     vscode.commands.registerCommand("vscode-bard.setCookie", async () => {
@@ -13,12 +15,26 @@ export function activate(context: vscode.ExtensionContext) {
         // 获取配置对象
         const config = vscode.workspace.getConfiguration("vscode-bard");
         // 更新配置项
-        config.update("cookies", cookie, vscode.ConfigurationTarget.Global);
+        config.update("cookies", cookie, vscode.ConfigurationTarget.Workspace);
       }
+    }),
+    vscode.commands.registerCommand("vscode-bard.cleanConversation", async () => {
+      vscode.window.showInformationMessage("Clean all conversations?", {
+          modal: true,
+        }, 
+        "Yes", 
+        "Cancel").then((value) => {
+          if (value === "Yes") {
+            context.workspaceState.update("data", {}).then(() => {
+              // vscode.commands.executeCommand("workbench.action.reloadWindow");
+              chatProvider.reloadAllData();
+            });
+          }
+      });
     })
   );
   vscode.window.registerWebviewViewProvider(
     "bard-chat",
-    new ChatProvider(context)
+    chatProvider,
   );
 }

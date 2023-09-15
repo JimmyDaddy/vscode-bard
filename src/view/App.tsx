@@ -151,7 +151,7 @@ function App() {
       (event: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
       }, 
-      500
+      200
     ), []);
 
   useEffect(() => {
@@ -209,7 +209,6 @@ function App() {
 
   window.addEventListener('message', (event) => {
     const msgData = event.data;
-    logger.debug(msgData, event, 'msgData');
     if (msgData.type === MSG.showResponse) {
       setData(data.filter(d => !d.isTemp).concat(JSON.parse(msgData.data)));
       setLoading(false);

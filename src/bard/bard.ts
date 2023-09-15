@@ -61,7 +61,7 @@ export default class Bard {
     vscode.window.showErrorMessage(err.message);
   }
 
-  private loadData() {
+  public loadData() {
     try {
       const data = this.context.workspaceState.get('data');
       this.conversationData = data || {};

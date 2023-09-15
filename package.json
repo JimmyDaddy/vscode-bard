@@ -21,9 +21,31 @@
     "commands": [
       {
         "command": "vscode-bard.setCookie",
-        "title": "Set Google Bard Cookie"
+        "title": "Set Google Bard Cookie",
+        "category": "bard",
+        "icon": "assets/cookie.svg"
+      },
+      {
+        "command": "vscode-bard.cleanConversation",
+        "title": "Clean Conversation",
+        "category": "bard",
+        "icon": "assets/clean.svg"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "vscode-bard.setCookie",
+          "when": "view == bard-chat",
+          "group": "navigation@0"
+        },
+        {
+          "command": "vscode-bard.cleanConversation",
+          "when": "view == bard-chat",
+          "group": "navigation@0"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "vscode-bard.setCookie",
