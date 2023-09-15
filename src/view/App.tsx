@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -17,7 +17,7 @@ import CellMeasurer, { CellMeasurerCache } from 'react-virtualized/dist/commonjs
 import { grey } from '@mui/material/colors';
 
 import logger from '../isomorphic/logger';
-import { uid } from '../isomorphic/utils';
+import { uid, debounce } from '../isomorphic/utils';
 import { MSG } from '../isomorphic/consts';
 
 import styles from './App.module.less';
@@ -140,17 +140,21 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [latestWidth, setLatestWidth] = useState(0);
   const list = useRef<any>(null);
+  const inputRef = useRef<any>(null);
 
   const _cache = new CellMeasurerCache({
     minHeight: 50,
   });
 
-  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setMessage(event.target.value);
-  }
+  const onChange = useCallback(
+    debounce(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        setMessage(event.target.value);
+      }, 
+      500
+    ), []);
 
   useEffect(() => {
-    logger.debug(data, 'data changed');
     list.current?.recomputeRowHeights();
     list.current?.scrollToRow(data.length);
   }, [data]);
@@ -170,6 +174,9 @@ function App() {
       }],
       isTemp: true,
     }));
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
     vscode.postMessage({ 
       type: 'sendMessage', 
       message: {
@@ -206,7 +213,7 @@ function App() {
     if (msgData.type === MSG.showResponse) {
       setData(data.filter(d => !d.isTemp).concat(JSON.parse(msgData.data)));
       setLoading(false);
-      setMessage('');
+      setMessage('');  
       return;
     }
 
@@ -260,9 +267,10 @@ function App() {
           placeholder="Ask bard here"
           onChange={onChange}
           className={styles.input}
-          value={message}
+          defaultValue={message}
           onKeyDown={handleKeyDown}
           multiline
+          inputRef={inputRef}
         />
         <IconButton onClick={onCLick} disabled={loading} >
           {

@@ -131,59 +131,60 @@ export default class Bard {
 
   private parseResponse(text: string) {
     logger.info(text, 'parseResponse');
+    const contentRaw = text.split("\n")?.find((line) => line.includes("wrb.fr"));
+    if (!contentRaw) { return; }
+    let data = JSON.parse(contentRaw);
+    this.conversationData.rpcids = data[0][1];
+    let responsesData = JSON.parse(data[0][2]);
+    if (!responsesData?.length) {
+      return;
+    }
+    const metaData: string[] = responsesData[1];
+    if (!metaData?.length) {
+      return;
+    }
 
-		try {
-      const contentRaw = text.split("\n")?.find((line) => line.includes("wrb.fr"));
-      if (contentRaw) {
-        let data = JSON.parse(contentRaw);
-        this.conversationData.rpcids = data[0][1];
-        let responsesData = JSON.parse(data[0][2]);
-        if (!responsesData?.length) {
-          this.showBardError(new Error(`Error parsing response: make sure you are using the correct cookie`));
-          return;
-        }
-        const metaData: string[] = responsesData[1];
-        if (!metaData?.length) {
-          this.showBardError(new Error(`Error parsing response meta: ${metaData}, make sure you are using the correct cookie`));
-          return;
-        }
+    const prompts = responsesData[2];
+    const answers = responsesData[4];
+    if (!prompts?.length || !answers?.length) {
+      return;
+    }
+    const responses: BardResponse[] = [];
+    for (const key in prompts) {
+      const prompt = prompts[key];
+      if (prompt && prompt[0] && answers[key] && answers[key]?.[1]) {
+        responses.push({
+          prompt: prompt[0],
+          rc: answers[key][0],
+          response: answers[key][1],
+        });
+      }
+    }
+    const resData = {
+      c: metaData.find(c => c.startsWith('c_')),
+      r: metaData.find(c => c.startsWith('r_')),
+      responses,
+    };
+    return resData;
+  }
 
-        const prompts = responsesData[2];
-        const answers = responsesData[4];
-        if (!prompts?.length || !answers?.length) {
-          this.showBardError(new Error(`Error parsing response prompts & answers: ${prompts} & ${answers}, make sure you are using the correct cookie`));
-          return;
-        }
-        const responses: BardResponse[] = [];
-        for (const key in prompts) {
-          const prompt = prompts[key];
-          if (prompt && prompt[0] && answers[key] && answers[key]?.[1]) {
-            responses.push({
-              prompt: prompt[0],
-              rc: answers[key][0],
-              response: answers[key][1],
-            });
-          }
-        }
-        const resData = {
-          c: metaData.find(c => c.startsWith('c_')),
-          r: metaData.find(c => c.startsWith('r_')),
-          responses,
-        };
-        return resData;
-      } else {
-        this.showBardError(new Error(`Error parsing response contentRaw-${contentRaw}: make sure you are using the correct cookie`));
+  private async requestBard(params: any, message: BardUserPrompt) {
+    let response = await axios.post(`${BARD_HOST}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate`, 
+      new URLSearchParams({
+        at: this.at,
+        "f.req": JSON.stringify([null, `[[${JSON.stringify(message.prompt)}],null,${JSON.stringify([this.conversationData.c || '', this.conversationData.r || '', message.rc || ''])}]`]),
+      }),
+      {
+        headers: {
+          Cookie: this.cookies,
+        },
+        params,
       }
-		} catch (err: any) {
-      logger.error(err);
-      if (err) {
-        err.message = `Error parsing response: make sure you are using the correct cookie: ${err.message}`;
-      } else {
-        err = new Error('Error parsing response: make sure you are using the correct cookie');
-      }
-			this.showBardError(err);
-		}
-	}
+    );
+
+    let parsedResponse = this.parseResponse(response.data);
+    return parsedResponse;
+  }
 
   public async ask(message: BardUserPrompt) {
     logger.debug(message, 'ask');
@@ -210,26 +211,27 @@ export default class Bard {
       if (this.conversationData.rpcids) {
         params.rpcids = this.conversationData.rpcids;
       }
-      let response = await axios.post(`${BARD_HOST}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate`, 
-        new URLSearchParams({
-          at: this.at,
-          "f.req": JSON.stringify([null, `[[${JSON.stringify(message.prompt)}],null,${JSON.stringify([this.conversationData.c || '', this.conversationData.r || '', message.rc || ''])}]`]),
-        }),
-        {
-          headers: {
-            Cookie: this.cookies,
-          },
-          params,
-        }
-      );
 
-      let parsedResponse = this.parseResponse(response.data);
+      let parsedResponse;
+      let retry = 0;
+      do {
+        try {
+          parsedResponse = await this.requestBard(params, message);
+        } catch (error) {
+          logger.debug(retry, parsedResponse, 'retry');
+          logger.error(error);
+          if (retry >= 3) {
+            throw error;
+          }
+        }
+        retry++;
+      } while (!parsedResponse && retry < 3);
       this.conversationData.c = parsedResponse?.c;
       this.conversationData.r = parsedResponse?.r;
 
       logger.debug(parsedResponse, 'parsedResponse');
       curMessage.responses = parsedResponse?.responses || [{
-        response: 'Failed to get bard answers',
+        response: 'Failed to get answers, pls retry or check your cookies',
         prompt: message.prompt,
         rc: message.rc || '',
       }];

@@ -28,3 +28,13 @@ export function getReqId(defaultNum?: number) {
   const baseBum = defaultNum % 10000;
   return (thousandsDigit + 1) * 10000 + baseBum;
 }
+
+export function debounce<T extends (...args: any[]) => any>(func: T, delay: number) {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (...args: Parameters<T>): void {
+    // @ts-ignore next-line
+    const context = this;
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(context, args), delay);
+  };
+}
