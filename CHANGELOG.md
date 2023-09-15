@@ -12,3 +12,11 @@
 ### 0.0.4
 
 - minimize extension bundle size
+
+### 0.0.5
+
+- fix: add bard request auto retry mechanism
+
+### 0.0.6
+
+- feat: support clean conversations data and customize sidebar toolbar action
