@@ -7,7 +7,7 @@
     "outDir": "./out",
 		"esModuleInterop": true,
 		"sourceMap": true,
-		"rootDir": "src",
+		"rootDir": "./",
 		"plugins": [{ "name": "typescript-plugin-css-modules" }],
 		"moduleResolution": "Node",
 		"strict": true   /* enable all strict type-checking options */
@@ -16,5 +16,5 @@
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "src/isomorphic/**/*", "src/view"],
 }

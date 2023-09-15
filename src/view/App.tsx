@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -14,23 +14,22 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import List from 'react-virtualized/dist/commonjs/List';
 import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 import CellMeasurer, { CellMeasurerCache } from 'react-virtualized/dist/commonjs/CellMeasurer';
+import { grey } from '@mui/material/colors';
 
-import { Response, Message } from '../bard';
-import logger from '../logger';
-import { uid } from '../bard/utils';
+import logger from '../isomorphic/logger';
+import { uid } from '../isomorphic/utils';
+import { MSG } from '../isomorphic/consts';
 
 import styles from './App.module.less';
-import { grey } from '@mui/material/colors';
-import { MSG } from '../consts';
 
 function Row(props: {
   index: number,
   style: any,
-  data: Message,
+  data: BardMessage,
   measure: any,
 }) {
   const { index, data: curData } = props;
-  const [response, setResponse] = useState<Response | undefined>(curData?.responses?.[0]);
+  const [response, setResponse] = useState<BardResponse | undefined>(curData?.responses?.[0]);
   const [deleteHover, setDeleteHover] = useState(false);
   if (!curData) {
     return null;
@@ -44,9 +43,13 @@ function Row(props: {
     setResponse(curData.responses?.[0]);
   }, [curData]);
 
+  useEffect(() => {
+    props.measure?.();
+  }, [response]);
+
   const handleCHange = (event: any) => {
     const value = event?.target?.value as string;
-    const response = curData?.responses?.find((response: Response) => response.prompt === value);
+    const response = curData?.responses?.find((response: BardResponse) => response.prompt === value);
     if (response) {
       setResponse(response);
     }
@@ -110,7 +113,7 @@ function Row(props: {
                     standard: styles.promptSelect,
                   }}
                 >
-                  {curData.responses?.map((response: Response, index: number) => (
+                  {curData.responses?.map((response: BardResponse, index: number) => (
                     <option
                       key={`${response.prompt}${index}response`}
                       value={response.prompt}
@@ -132,7 +135,7 @@ function Row(props: {
 };
 
 function App() {
-  const [data, setData] = useState<Message[]>([]);
+  const [data, setData] = useState<BardMessage[]>([]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [latestWidth, setLatestWidth] = useState(0);
@@ -147,6 +150,7 @@ function App() {
   }
 
   useEffect(() => {
+    logger.debug(data, 'data changed');
     list.current?.recomputeRowHeights();
     list.current?.scrollToRow(data.length);
   }, [data]);

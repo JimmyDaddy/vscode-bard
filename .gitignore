@@ -6,3 +6,5 @@ node_modules
 package-lock.json
 _dataSample.*
 .DS_store
+out/**/*.js
+*.js.map

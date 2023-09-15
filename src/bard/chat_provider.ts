@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import Bard, { UserPrompt } from './bard';
+import Bard from './bard';
 import path from 'path';
-import logger from './logger';
-import { MSG } from './consts';
+import logger from '../isomorphic/logger';
+import { MSG } from '../isomorphic/consts';
 
 export default class ChatProvider implements vscode.WebviewViewProvider {
   context: vscode.ExtensionContext;
@@ -58,7 +58,7 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
       }
     });
 
-    const sendMessage = async (message: UserPrompt) => {
+    const sendMessage = async (message: BardUserPrompt) => {
       let response = await this.bot.ask(message);
       webviewView.webview.postMessage({
         type: MSG.showResponse,

@@ -18,7 +18,10 @@ module.exports = {
     rules: [
       {
         test: /.(ts|tsx)$/, // 匹配.ts, tsx文件
-        exclude: [ /node_modules/ ],
+        exclude: [ 
+          /node_modules/,
+          path.resolve(__dirname, './src/bard/')
+        ],
         use: {
           loader: 'babel-loader',
           options: {

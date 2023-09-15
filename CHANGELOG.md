@@ -8,3 +8,7 @@
 
 - fix dependencies not found error
 - fix webview resources load error
+
+### 0.0.4
+
+- minimize extension bundle size

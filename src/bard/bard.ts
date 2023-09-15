@@ -4,28 +4,10 @@ import axios, { AxiosInstance } from "axios";
 import * as vscode from 'vscode';
 import { load } from 'cheerio';
 import vm from 'vm';
-import logger from "../logger";
-import { uid, getReqId } from './utils';
+import logger from "../isomorphic/logger";
+import { uid, getReqId } from '../isomorphic/utils';
 
 const BARD_HOST = 'https://bard.google.com';
-
-export interface Response {
-  prompt: string;
-  response: string;
-  rc?: string;
-}
-export interface Message {
-  ask?: string;
-  responses?: Response[];
-  isTemp?: boolean;
-  uid: string;
-};
-
-export interface UserPrompt {
-  rc?: string;
-  prompt: string;
-  uid?: string;
-}
 
 export default class Bard {
   private cookies: string;
@@ -39,7 +21,7 @@ export default class Bard {
     r?: string;
     at?: string;
     bl?: string;
-    messages?: Message[];
+    messages?: BardMessage[];
     rpcids?: string;
   } = {};
 
@@ -172,7 +154,7 @@ export default class Bard {
           this.showBardError(new Error(`Error parsing response prompts & answers: ${prompts} & ${answers}, make sure you are using the correct cookie`));
           return;
         }
-        const responses: Response[] = [];
+        const responses: BardResponse[] = [];
         for (const key in prompts) {
           const prompt = prompts[key];
           if (prompt && prompt[0] && answers[key] && answers[key]?.[1]) {
@@ -203,13 +185,13 @@ export default class Bard {
 		}
 	}
 
-  public async ask(message: UserPrompt) {
+  public async ask(message: BardUserPrompt) {
     logger.debug(message, 'ask');
     if (!this.at || !this.bl) {
       await this.getVerifyParams();
     }
 
-    const curMessage: Message = {
+    const curMessage: BardMessage = {
       ask: message.prompt,
       uid: message.uid || uid(),
     };
