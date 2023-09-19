@@ -95,37 +95,35 @@ export default class Bard {
    * @returns {Promise<{at: string, bl: string}>}
    */
   private async getVerifyParams() {
-    try {
-      const response = await this.axios.get(BARD_HOST, {
-        headers: {
-          Cookie: this.cookies,
-        },
-      });
-      let responseData = load(response.data);
-      let script: string | null | undefined = responseData(
-        "script[data-id=_gd]"
-      )?.html();
-      script = script?.replace("window.WIZ_global_data", "data");
-      if (!script) {
-        this.showBardError(new Error(`Get Bard Request Params Error: responseData is null`));
-        return;
-      }
-      const context = { data: { cfb2h: "", SNlM0e: "", sEwWPd: "", N5bhKc: "", P4fUA: "", TuX5cc: "" } };
-      vm.createContext(context);
-      vm.runInContext(script, context);
-      logger.info(context, 'context');
-      this.at = context.data.SNlM0e;
-      this.bl = context.data.cfb2h;
-      this.conversationData.at = this.at;
-      this.conversationData.bl = this.bl;
-      // const localeList = context.data.P4fUA;
-      // const sampleMessages = context.data.sEwWPd?.split('◊');
-      const locale = context.data.TuX5cc;
-      if (locale) {
-        this.locale = locale;
-      }
-    } catch (e: any) {
-      this.showBardError(new Error(`Error parsing response: ${e.message}`));
+    const response = await this.axios.get(BARD_HOST, {
+      headers: {
+        Cookie: this.cookies,
+      },
+    });
+    let responseData = load(response.data);
+    let script: string | null | undefined = responseData(
+      "script[data-id=_gd]"
+    )?.html();
+    script = script?.replace("window.WIZ_global_data", "data");
+    if (!script) {
+      this.showBardError(new Error(`Get Bard Request Params Error: responseData is null`));
+      return;
+    }
+    const context = { data: { cfb2h: "", SNlM0e: "", sEwWPd: "", N5bhKc: "", P4fUA: "", TuX5cc: "" } };
+    vm.createContext(context);
+    vm.runInContext(script, context);
+    logger.info(context, 'context');
+    if (!context.data.SNlM0e) {
+      vscode.window.showErrorMessage('Failed to get bard params SNlM0e, pls check your cookies');
+      throw new Error('Failed to get bard params SNlM0e, pls check your cookies');
+    }
+    this.at = context.data.SNlM0e;
+    this.bl = context.data.cfb2h;
+    this.conversationData.at = this.at;
+    this.conversationData.bl = this.bl;
+    const locale = context.data.TuX5cc;
+    if (locale) {
+      this.locale = locale;
     }
   }
 
@@ -188,9 +186,6 @@ export default class Bard {
 
   public async ask(message: BardUserPrompt) {
     logger.debug(message, 'ask');
-    if (!this.at || !this.bl) {
-      await this.getVerifyParams();
-    }
 
     const curMessage: BardMessage = {
       ask: message.prompt,
@@ -203,6 +198,9 @@ export default class Bard {
     logger.debug(this.at, this.bl, this.reqId, 'init ask data');
 
     try {
+      if (!this.at || !this.bl) {
+        await this.getVerifyParams();
+      }
       const params: any = {
         bl: this.bl,
         rt: "c",

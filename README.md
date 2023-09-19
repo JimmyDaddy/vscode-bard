@@ -36,5 +36,6 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 * Click on any request of the host `bard.google.com` and copy the value of `Cookie` header.
 * Paste the value in the extension settings `vscode-bard.cookies`.
 * OR use shot cut `ctrl+shift+B` and paste the value.
+  ![Example2](./assets/getcookie2.png)
 
 **Enjoy!**

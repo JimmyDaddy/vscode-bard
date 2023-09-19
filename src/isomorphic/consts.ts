@@ -6,4 +6,5 @@ export enum MSG {
   showResponse = 'showResponse',
   deleteMessage = 'deleteMessage',
   deleteMessageSuccess = 'deleteMessageSuccess',
+  initPromptHistory = 'initPromptHistory',
 }
