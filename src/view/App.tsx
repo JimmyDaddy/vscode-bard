@@ -16,7 +16,6 @@ import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 import CellMeasurer, { CellMeasurerCache } from 'react-virtualized/dist/commonjs/CellMeasurer';
 import { grey } from '@mui/material/colors';
 
-import logger from '../isomorphic/logger';
 import { uid, debounce } from '../isomorphic/utils';
 import { MSG } from '../isomorphic/consts';
 
@@ -139,6 +138,8 @@ function App() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [latestWidth, setLatestWidth] = useState(0);
+  const [inputHistory, setInputHistory] = useState<string[]>([]);
+  const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
   const list = useRef<any>(null);
   const inputRef = useRef<any>(null);
 
@@ -150,6 +151,7 @@ function App() {
     debounce(
       (event: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
+        setCurrentInputIndex(-1);
       }, 
       200
     ), []);
@@ -174,6 +176,10 @@ function App() {
       }],
       isTemp: true,
     }));
+    if (!inputHistory.includes(message) && message && typeof message === 'string' && message.trim().length > 0) {
+      setInputHistory(inputHistory.concat(message));
+    }
+    setCurrentInputIndex(-1);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
@@ -222,13 +228,38 @@ function App() {
     }
 
     if (msgData.type === MSG.initData) {
-      setData(JSON.parse(msgData.data));
+      const d = JSON.parse(msgData.data) || {};
+      setData(d.conversations || []);
+      setInputHistory(d.promptHistory || []);
     }
   });
 
   const handleKeyDown = (event: any) => {
     if (event.keyCode === 13 && !event.shiftKey) {
       onCLick();
+      event.preventDefault();
+    } else if (event.keyCode === 38) {
+      const index = currentInputIndex === -1? inputHistory.length - 1 : currentInputIndex - 1;
+      if (index >= 0 && inputHistory[index]) {
+        setMessage(inputHistory[index]);
+        if (inputRef.current) {
+          inputRef.current.value = inputHistory[index];
+        }
+        setCurrentInputIndex(index);
+      }
+      event.preventDefault();
+    } else if (event.keyCode === 40) {
+      if (currentInputIndex === -1 || currentInputIndex === inputHistory.length - 1) {
+        return;
+      }
+      const index = currentInputIndex + 1;
+      if (index < inputHistory.length && inputHistory[index]) {
+        setMessage(inputHistory[index]);
+        if (inputRef.current) {
+          inputRef.current.value = inputHistory[index];
+        }
+        setCurrentInputIndex(index);
+      }
       event.preventDefault();
     }
   };
@@ -270,6 +301,7 @@ function App() {
           onKeyDown={handleKeyDown}
           multiline
           inputRef={inputRef}
+          disabled={loading}
         />
         <IconButton onClick={onCLick} disabled={loading} >
           {

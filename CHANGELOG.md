@@ -20,3 +20,7 @@
 ### 0.0.6
 
 - feat: support clean conversations data and customize sidebar toolbar action
+
+### 0.0.7
+
+- feat: support prompt history records

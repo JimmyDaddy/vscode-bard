@@ -8,6 +8,7 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
   context: vscode.ExtensionContext;
   private bot: Bard;
   private webviewView: vscode.WebviewView | undefined;
+  private promptHistory: string[] = [];
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -15,6 +16,7 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
 
     let cookies = config.get('cookies') as string;
     this.bot = new Bard(this.context, cookies);
+    this.promptHistory = this.context.workspaceState.get('promptHistory') as string[] || [];
   }
   // 实现 resolveWebviewView 方法，用于处理 WebviewView 的创建和设置
   resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
@@ -45,10 +47,13 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
         sendMessage(message.message);
       } else if (message.type === MSG.initialized) {
         const data = this.bot.getConversationData();
-        if (data.messages) {
+        if (data.messages || this.promptHistory?.length > 0) {
           webviewView.webview.postMessage({
             type: MSG.initData,
-            data: JSON.stringify(data.messages),
+            data: JSON.stringify({
+              conversations: data.messages,
+              promptHistory: this.promptHistory,
+            }),
           });
         }
       } else if (message.type === MSG.deleteMessage) {
@@ -62,6 +67,8 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
     });
 
     const sendMessage = async (message: BardUserPrompt) => {
+      this.promptHistory.push(message.prompt);
+      this.context.workspaceState.update('promptHistory', this.promptHistory);
       let response = await this.bot.ask(message);
       webviewView.webview.postMessage({
         type: MSG.showResponse,
@@ -129,7 +136,7 @@ function getWebviewContent(srcUri: string) {
     <div id="root"></div>
     <script>
       window.onload = () => {
-        window.vscode.postMessage({ type: 'initialized' });
+        window.vscode.postMessage({ type: '${MSG.initialized}' });
       };
     </script>
   </body>
