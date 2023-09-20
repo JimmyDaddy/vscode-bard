@@ -8,7 +8,10 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 * Chat with google bard(beta) in vscode
 * Multiple answers for one question
 
-  <img src="./assets/sample.png" alt="Example Image" width="450">
+  <p style='display:flex; align-items: flex-start'>
+    <img src="./assets/sample.png" alt="Example Image" width="450" style="display: inline; margin-right: 8px">
+    <img src="./assets/sample1.png" alt="Example Image" width="450" style="display: inline">
+  </p>
 
 ## Extension Settings
 

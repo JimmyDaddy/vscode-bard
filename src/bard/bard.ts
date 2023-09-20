@@ -6,6 +6,7 @@ import { load } from 'cheerio';
 import vm from 'vm';
 import logger from "../isomorphic/logger";
 import { uid, getReqId } from '../isomorphic/utils';
+import { DEFAULT_RESPONSE_MESSAGE } from "../isomorphic/consts";
 
 const BARD_HOST = 'https://bard.google.com';
 
@@ -229,7 +230,7 @@ export default class Bard {
 
       logger.debug(parsedResponse, 'parsedResponse');
       curMessage.responses = parsedResponse?.responses || [{
-        response: 'Failed to get answers, pls retry or check your cookies',
+        response: DEFAULT_RESPONSE_MESSAGE,
         prompt: message.prompt,
         rc: message.rc || '',
       }];
@@ -238,7 +239,7 @@ export default class Bard {
       logger.error('failed to get bard answers: ', error);
       this.showBardError(error);
       curMessage.responses = [{
-        response: error.message || 'Failed to get answers, pls retry or check your cookies',
+        response: error.message || DEFAULT_RESPONSE_MESSAGE,
         prompt: message.prompt,
         rc: message.rc || '',
       }];

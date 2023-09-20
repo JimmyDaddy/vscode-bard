@@ -18,6 +18,7 @@ import { grey } from '@mui/material/colors';
 
 import { uid, debounce } from '../isomorphic/utils';
 import { MSG } from '../isomorphic/consts';
+import CodeBlock from './CodeBlock';
 
 import styles from './App.module.less';
 
@@ -90,7 +91,9 @@ function Row(props: {
           </div>
         </div>
         <div className={styles.content}>
-          <ReactMarkdown>{curData.ask || ''}</ReactMarkdown>
+          <ReactMarkdown>
+            {curData.ask || ''}
+          </ReactMarkdown>
         </div>
       </div>
       <div className={styles.contentContainer}>
@@ -126,7 +129,15 @@ function Row(props: {
           }
         </div>
         <div className={styles.responseContainer}>
-          <ReactMarkdown key={`${index}response`}>{`${response?.response || ''}`}</ReactMarkdown>
+          <ReactMarkdown
+            key={`${index}response`}
+            children={`${response?.response || ''}`}
+            components={{
+              code(props) {
+                return <CodeBlock {...props }/>;
+              }
+            }}
+          />
         </div>
       </div>
     </div>
