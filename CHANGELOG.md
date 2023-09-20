@@ -1,3 +1,12 @@
+
+
+## [0.0.9](https://github.com/JimmyDaddy/vscode-bard/compare/v0.0.8...v0.0.9) (2023-09-20)
+
+
+### Bug Fixes
+
+* use global user settings and fix input event scroll trigger ([474dd80](https://github.com/JimmyDaddy/vscode-bard/commit/474dd8066913649e4f9994e8d45cd3728c8db1d7))
+
 # Change Log
 
 ## [0.0.8](https://github.com/JimmyDaddy/vscode-bard/compare/0.0.7...v0.0.8) (2023-09-20)
