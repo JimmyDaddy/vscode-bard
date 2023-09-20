@@ -11,7 +11,7 @@ import { DEFAULT_RESPONSE_MESSAGE } from "../isomorphic/consts";
 const BARD_HOST = 'https://bard.google.com';
 
 export default class Bard {
-  private cookies: string;
+  private cookie: string;
   private axios: AxiosInstance;
   public locale: string = 'en';
   private at: string = '';
@@ -28,8 +28,8 @@ export default class Bard {
 
   private context: vscode.ExtensionContext;
 
-  constructor(context: vscode.ExtensionContext, cookies: string) {
-    this.cookies = cookies;
+  constructor(context: vscode.ExtensionContext, cookie: string) {
+    this.cookie = cookie;
     this.axios = axios.create({
       baseURL: BARD_HOST,
       headers: {
@@ -83,12 +83,12 @@ export default class Bard {
     this.context.workspaceState.update('data', this.conversationData);
   }
 
-  public setCookies(cookies: string) {
-    if (cookies !== this.cookies) {
+  public setCookies(cookie: string) {
+    if (cookie !== this.cookie) {
       this.at = '';
       this.bl = '';
     }
-    this.cookies = cookies;
+    this.cookie = cookie;
   }
 
   /**
@@ -98,7 +98,7 @@ export default class Bard {
   private async getVerifyParams() {
     const response = await this.axios.get(BARD_HOST, {
       headers: {
-        Cookie: this.cookies,
+        Cookie: this.cookie,
       },
     });
     let responseData = load(response.data);
@@ -175,7 +175,7 @@ export default class Bard {
       }),
       {
         headers: {
-          Cookie: this.cookies,
+          Cookie: this.cookie,
         },
         params,
       }

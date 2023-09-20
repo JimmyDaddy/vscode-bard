@@ -81,7 +81,7 @@
     "configuration": {
       "title": "vscode bard",
       "properties": {
-        "vscode-bard.cookies": {
+        "vscode-bard.cookie": {
           "type": "string",
           "default": ""
         }

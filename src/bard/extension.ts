@@ -8,14 +8,14 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("vscode-bard.setCookie", async () => {
       const cookie = await vscode.window.showInputBox({
-        prompt: "Enter your Google cookies",
+        prompt: "Enter your Google cookie",
       });
 
       if (cookie) {
         // 获取配置对象
         const config = vscode.workspace.getConfiguration("vscode-bard");
         // 更新配置项
-        config.update("cookies", cookie, vscode.ConfigurationTarget.Workspace);
+        config.update("cookie", cookie, vscode.ConfigurationTarget.Global);
       }
     }),
     vscode.commands.registerCommand("vscode-bard.cleanConversation", async () => {

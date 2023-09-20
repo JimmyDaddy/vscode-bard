@@ -40,7 +40,9 @@ function App() {
 
   useEffect(() => {
     list.current?.recomputeRowHeights();
-    list.current?.scrollToRow(data.length);
+    requestAnimationFrame(() => {
+      list.current?.scrollToPosition(list.current?.getOffsetForRow({ alignment: 'end', index: data.length - 1 }));
+    });
   }, [data]);
 
   function onCLick() {
