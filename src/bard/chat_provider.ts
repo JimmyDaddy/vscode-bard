@@ -15,8 +15,9 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
     this.context = context;
     const config = vscode.workspace.getConfiguration('vscode-bard');
 
-    let cookies = config.get('cookies') as string;
-    this.bot = new Bard(this.context, cookies);
+    let cookie = config.get('cookie') as string;
+    this.bot = new Bard(this.context, cookie);
+    console.log(cookie, 'cookie');
     this.promptHistory = this.context.workspaceState.get('promptHistory') as string[] || [];
   }
   // 实现 resolveWebviewView 方法，用于处理 WebviewView 的创建和设置
@@ -33,10 +34,10 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
 
     this.context.subscriptions.push(
       vscode.workspace.onDidChangeConfiguration((event) => {
-        if (event.affectsConfiguration('vscode-bard.cookies')) {
+        if (event.affectsConfiguration('vscode-bard.cookie')) {
           const config = vscode.workspace.getConfiguration('vscode-bard');
-          const cookies = config.get('cookies') as string;
-          logger.info('set cookies');
+          const cookies = config.get('cookie') as string;
+          logger.info('set cookie');
           this.bot.setCookies(cookies);
         }
       })
