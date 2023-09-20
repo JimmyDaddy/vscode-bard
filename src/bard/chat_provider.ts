@@ -3,6 +3,7 @@ import Bard from './bard';
 import path from 'path';
 import logger from '../isomorphic/logger';
 import { MSG } from '../isomorphic/consts';
+import { showWindowMsg } from './utils';
 
 export default class ChatProvider implements vscode.WebviewViewProvider {
   context: vscode.ExtensionContext;
@@ -63,12 +64,19 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
           type: MSG.deleteMessageSuccess,
           data: JSON.stringify({ uid }),
         });
+      } else if (message.type === MSG.showInfo) {
+        showWindowMsg(message.message);
       }
     });
 
     const sendMessage = async (message: BardUserPrompt) => {
-      this.promptHistory.push(message.prompt);
-      this.context.workspaceState.update('promptHistory', this.promptHistory);
+      if (!message.prompt) {
+        return;
+      }
+      if (!this.promptHistory.includes(message.prompt)) {
+        this.promptHistory.push(message.prompt);
+        this.context.workspaceState.update('promptHistory', this.promptHistory);
+      }
       let response = await this.bot.ask(message);
       webviewView.webview.postMessage({
         type: MSG.showResponse,

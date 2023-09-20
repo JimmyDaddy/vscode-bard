@@ -1,0 +1,24 @@
+.normalCode {
+  background-color: #2F2F2F;
+  display: inline-block;
+
+  &.multiline {
+    display: block;
+    padding: 8px;
+  }
+}
+
+.codeBlockContainer {
+  position: relative;
+
+  .contentCopyIBtn {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    display: none;
+
+    &.show {
+      display: inline-block;
+    }
+  }
+}
