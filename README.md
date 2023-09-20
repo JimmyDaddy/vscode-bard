@@ -1,8 +1,5 @@
-# Google Bard (beta) vscode extension
+# <img src="/assets/bard.png" alt="Example Image" width="40" style="display: inline"> Google Bard (beta) vscode extension
 
-<p align="center">
-  <img src="/assets/bard.png" alt="Example Image" width="30">
-</p>
 
 This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) extension
 
@@ -10,7 +7,7 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 
 * Chat with google bard(beta) in vscode
 * Multiple answers for one question
-  ![Example](./assets/sample.png)
+  <img src="./assets/sample.png" alt="Example Image" width="300">
 
 ## Extension Settings
 
@@ -37,5 +34,7 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 * Paste the value in the extension settings `vscode-bard.cookies`.
 * OR use shot cut `ctrl+shift+B` and paste the value.
   ![Example2](./assets/getcookie2.png)
+
+> ***Due to Google's security policy, different regions may require different cookies. You can try setting all cookies starting with __Secure-1, or copy the entire cookie value as in Solution 2***.
 
 **Enjoy!**

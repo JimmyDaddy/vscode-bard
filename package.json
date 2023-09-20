@@ -12,6 +12,14 @@
     "Programming Languages",
     "Other"
   ],
+  "keywords": [
+    "google",
+    "bard",
+    "vscode",
+    "extension",
+    "chat",
+    "chatbot"
+  ],
   "pricing": "Free",
   "icon": "assets/bard.png",
   "publisher": "jimmydaddy",
@@ -97,6 +105,8 @@
     "@babel/core": "^7.22.15",
     "@babel/preset-react": "^7.22.15",
     "@babel/preset-typescript": "^7.22.15",
+    "@commitlint/config-conventional": "^17.7.0",
+    "@release-it/conventional-changelog": "^7.0.1",
     "@types/css-modules": "^1.0.3",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
@@ -110,6 +120,7 @@
     "@vscode/test-electron": "^2.3.4",
     "autoprefixer": "^10.4.15",
     "babel-loader": "^9.1.3",
+    "commitlint": "^17.7.1",
     "css-loader": "^6.8.1",
     "eslint": "^8.47.0",
     "glob": "^10.3.3",
@@ -151,5 +162,28 @@
   "bugs": {
     "url": "https://github.com/JimmyDaddy/vscode-bard/issues",
     "email": "heyjimmygo@gmail.com"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": false
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "angular",
+        "infile": "CHANGELOG.md"
+      }
+    }
   }
 }
