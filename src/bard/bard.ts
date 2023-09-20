@@ -188,7 +188,7 @@ export default class Bard {
   public async ask(message: BardUserPrompt) {
     logger.debug(message, 'ask');
 
-    const curMessage: BardMessage = {
+    let curMessage: BardMessage = {
       ask: message.prompt,
       uid: message.uid || uid(),
     };
@@ -196,6 +196,11 @@ export default class Bard {
     if (!this.conversationData.messages) {
       this.conversationData.messages = [];
     }
+
+    if (message.uid) {
+      curMessage = this.conversationData.messages.find((msg) => msg.uid === message.uid) || curMessage;
+    }
+
     logger.debug(this.at, this.bl, this.reqId, 'init ask data');
 
     try {
@@ -244,7 +249,12 @@ export default class Bard {
         rc: message.rc || '',
       }];
     }
-    this.conversationData.messages.push(curMessage);
+    const existIndex = this.conversationData.messages.findIndex((v) => v.uid === curMessage.uid)
+    if (existIndex === -1) {
+      this.conversationData.messages.push(curMessage);
+    } else {
+      this.conversationData.messages[existIndex] = curMessage;
+    }
     this.saveData();
     return curMessage;
   }
