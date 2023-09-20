@@ -7,7 +7,8 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 
 * Chat with google bard(beta) in vscode
 * Multiple answers for one question
-  <img src="./assets/sample.png" alt="Example Image" width="300">
+
+  <img src="./assets/sample.png" alt="Example Image" width="450">
 
 ## Extension Settings
 
@@ -24,7 +25,7 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 * Paste the value `__Secure-1PSID={WHAT YOU COPIED}` in the extension settings `vscode-bard.cookies`.
 * OR use shot cut `ctrl+shift+B` and paste the value.
 
-  ![Example](./assets/getcookie.png)
+  <img src="./assets/getcookie.png" alt="Example Image" width="450">
 
 ### Solution 2
 
@@ -33,7 +34,8 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 * Click on any request of the host `bard.google.com` and copy the value of `Cookie` header.
 * Paste the value in the extension settings `vscode-bard.cookies`.
 * OR use shot cut `ctrl+shift+B` and paste the value.
-  ![Example2](./assets/getcookie2.png)
+
+  <img src="./assets/getcookie2.png" alt="Example Image" width="450">
 
 > ***Due to Google's security policy, different regions may require different cookies. You can try setting all cookies starting with __Secure-1, or copy the entire cookie value as in Solution 2***.
 
