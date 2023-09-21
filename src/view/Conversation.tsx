@@ -13,7 +13,7 @@ import styles from "./Conversation.module.less";
 import { MSG } from "../isomorphic/consts";
 import CodeBlock from './CodeBlock';
 
-export default function Conversation(props: {
+function Conversation(props: {
   index: number,
   style: any,
   data: BardMessage,
@@ -33,6 +33,7 @@ export default function Conversation(props: {
 
   useEffect(() => {
     setResponse(curData.responses?.[0]);
+    props.measure?.();
   }, [curData]);
 
   useEffect(() => {
@@ -152,3 +153,5 @@ export default function Conversation(props: {
     </div>
   );
 };
+
+export default React.forwardRef(Conversation);

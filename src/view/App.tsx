@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/InputBase';
@@ -25,9 +25,9 @@ function App() {
   const list = useRef<any>(null);
   const inputRef = useRef<any>(null);
 
-  const _cache = new CellMeasurerCache({
+  const _cache = useMemo(() => new CellMeasurerCache({
     minHeight: 50,
-  });
+  }), [data]);
 
   const onChange = useCallback(
     debounce(
@@ -39,7 +39,9 @@ function App() {
     ), []);
 
   useEffect(() => {
-    list.current?.recomputeRowHeights();
+    if (data.length) {
+      list.current?.measureAllRows();
+    }
     requestAnimationFrame(() => {
       list.current?.scrollToPosition(list.current?.getOffsetForRow({ alignment: 'end', index: data.length - 1 }));
     });
@@ -89,13 +91,14 @@ function App() {
         rowIndex={index}
         parent={parent}
       >
-        {({ measure }) => (
+        {({ measure, registerChild }) => (
           <Conversation
             index={index}
             style={style}
             data={data[index]}
             measure={measure}
             onRetry={retry}
+            ref={registerChild}
           />
         )}
       </CellMeasurer>
@@ -177,7 +180,9 @@ function App() {
           {({ height, width }) => {
             if (latestWidth && latestWidth !== width) {
               _cache.clearAll();
-              list.current?.recomputeRowHeights();
+              if (data.length) {
+                list.current?.measureAllRows();
+              }
             }
             setLatestWidth(width);
             return (
