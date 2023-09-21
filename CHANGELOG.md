@@ -1,5 +1,12 @@
 
 
+## [0.0.10](https://github.com/JimmyDaddy/vscode-bard/compare/v0.0.9...v0.0.10) (2023-09-21)
+
+
+### Bug Fixes
+
+* update cookie automatically after every request and fix parse answers error ([0aae04d](https://github.com/JimmyDaddy/vscode-bard/commit/0aae04da523dd6d23d563323a6faac57fbeffa46))
+
 ## [0.0.9](https://github.com/JimmyDaddy/vscode-bard/compare/v0.0.8...v0.0.9) (2023-09-20)
 
 
