@@ -26,3 +26,9 @@ export function showWindowMsg(data: {
       break;
   }
 }
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}

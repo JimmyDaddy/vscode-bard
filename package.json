@@ -2,7 +2,7 @@
   "name": "vscode-bard",
   "displayName": "vscode bard",
   "description": "google bard for vscode",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "engines": {
     "vscode": "^1.82.0"
   },
@@ -116,6 +116,7 @@
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-virtualized": "^9.21.22",
     "@types/react-window": "^1.8.5",
+    "@types/set-cookie-parser": "^2.4.3",
     "@types/vscode": "^1.82.0",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
@@ -158,6 +159,7 @@
     "react-markdown": "^8.0.7",
     "react-syntax-highlighter": "^15.5.0",
     "react-virtualized": "^9.22.5",
+    "set-cookie-parser": "^2.6.0",
     "tslog": "^4.9.2"
   },
   "repository": {

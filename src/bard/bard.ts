@@ -4,11 +4,12 @@ import axios, { AxiosInstance } from "axios";
 import * as vscode from 'vscode';
 import { load } from 'cheerio';
 import vm from 'vm';
+import setCookieParser from 'set-cookie-parser';
+
 import logger from "../isomorphic/logger";
 import { uid, getReqId } from '../isomorphic/utils';
-import { DEFAULT_RESPONSE_MESSAGE } from "../isomorphic/consts";
-
-const BARD_HOST = 'https://bard.google.com';
+import { DEFAULT_RESPONSE_MESSAGE, DEFAULT_RESPONSE_MESSAGE_SNlM0E, BARD_HOST, GOOGLE_ACCOUNT_HOST } from "../isomorphic/consts";
+import { sleep } from "./utils";
 
 export default class Bard {
   private cookie: string;
@@ -25,6 +26,7 @@ export default class Bard {
     messages?: BardMessage[];
     rpcids?: string;
   } = {};
+  private atConsumeCount: number = 0;
 
   private context: vscode.ExtensionContext;
 
@@ -83,12 +85,13 @@ export default class Bard {
     this.context.workspaceState.update('data', this.conversationData);
   }
 
-  public setCookies(cookie: string) {
+  public async setCookies(cookie: string) {
     if (cookie !== this.cookie) {
       this.at = '';
       this.bl = '';
     }
     this.cookie = cookie;
+    await this.getVerifyParams();
   }
 
   /**
@@ -116,7 +119,7 @@ export default class Bard {
     logger.info(context, 'context');
     if (!context.data.SNlM0e) {
       vscode.window.showErrorMessage('Failed to get bard params SNlM0e, pls check your cookies');
-      throw new Error('Failed to get bard params SNlM0e, pls check your cookies');
+      throw new Error(DEFAULT_RESPONSE_MESSAGE_SNlM0E);
     }
     this.at = context.data.SNlM0e;
     this.bl = context.data.cfb2h;
@@ -126,9 +129,10 @@ export default class Bard {
     if (locale) {
       this.locale = locale;
     }
+    this.atConsumeCount = 0;
   }
 
-  private parseResponse(text: string) {
+  private parseResponse(text: string, defaultPrompt?: string) {
     logger.info(text, 'parseResponse');
     const contentRaw = text.split("\n")?.find((line) => line.includes("wrb.fr"));
     if (!contentRaw) { return; }
@@ -145,15 +149,16 @@ export default class Bard {
 
     const prompts = responsesData[2];
     const answers = responsesData[4];
-    if (!prompts?.length || !answers?.length) {
+    if (!answers?.length) {
       return;
     }
     const responses: BardResponse[] = [];
-    for (const key in prompts) {
-      const prompt = prompts[key];
-      if (prompt && prompt[0] && answers[key] && answers[key]?.[1]) {
+
+    for (const key in answers) {
+      const prompt = prompts?.[key];
+      if (answers[key] && answers[key]?.[1]) {
         responses.push({
-          prompt: prompt[0],
+          prompt: prompt?.[0] || (`${key} - ${defaultPrompt}`),
           rc: answers[key][0],
           response: answers[key][1],
         });
@@ -168,7 +173,7 @@ export default class Bard {
   }
 
   private async requestBard(params: any, message: BardUserPrompt) {
-    let response = await axios.post(`${BARD_HOST}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate`, 
+    const response = await axios.post(`${BARD_HOST}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate`, 
       new URLSearchParams({
         at: this.at,
         "f.req": JSON.stringify([null, `[[${JSON.stringify(message.prompt)}],null,${JSON.stringify([this.conversationData.c || '', this.conversationData.r || '', message.rc || ''])}]`]),
@@ -181,13 +186,49 @@ export default class Bard {
       }
     );
 
-    let parsedResponse = this.parseResponse(response.data);
+    let parsedResponse = this.parseResponse(response.data, message.prompt);
+    if (parsedResponse) {
+      this.updateCookie(response.headers['set-cookie']);
+    }
     return parsedResponse;
+  }
+
+  private updateCookie(setCookie: string[] | undefined) {
+    if (setCookie) {
+      const cookies = setCookieParser.parse(setCookie);
+      const cookieObj = this.parseCookie(this.cookie);
+      cookies.map((cookie) => {
+        cookieObj[cookie.name] = cookie.value;
+      });
+      
+      let cookieStr = '';
+      for (const key in cookieObj) {
+        cookieStr += `${key}=${cookieObj[key]};`;
+      }
+      this.cookie = cookieStr;
+      // 获取配置对象
+      const config = vscode.workspace.getConfiguration("vscode-bard");
+      // 更新配置项
+      config.update("cookie", cookieStr, vscode.ConfigurationTarget.Global);
+    }
+  }
+
+  private parseCookie(cookieStr: string) {
+    let cookieArr = cookieStr.split(";");
+    let obj: { 
+      [key: string]: string
+    } = {};
+    cookieArr.forEach((i) => {
+      let arr = i.split("=");
+      obj[arr[0]] = arr[1];
+    });
+    return obj;
   }
 
   public async ask(message: BardUserPrompt) {
     logger.debug(message, 'ask');
 
+    // await this.rotateCookie();
     let curMessage: BardMessage = {
       ask: message.prompt,
       uid: message.uid || uid(),
@@ -204,7 +245,7 @@ export default class Bard {
     logger.debug(this.at, this.bl, this.reqId, 'init ask data');
 
     try {
-      if (!this.at || !this.bl) {
+      if (!this.at || !this.bl || this.atConsumeCount >= 10) {
         await this.getVerifyParams();
       }
       const params: any = {
@@ -224,12 +265,14 @@ export default class Bard {
         } catch (error) {
           logger.debug(retry, parsedResponse, 'retry');
           logger.error(error);
-          if (retry >= 3) {
+          if (retry >= 5) {
             throw error;
           }
+          await sleep(200);
         }
         retry++;
-      } while (!parsedResponse && retry < 3);
+        this.atConsumeCount += 1;
+      } while (!parsedResponse && retry < 5);
       this.conversationData.c = parsedResponse?.c;
       this.conversationData.r = parsedResponse?.r;
 
@@ -261,6 +304,26 @@ export default class Bard {
 
   private updateReqId() {
     this.reqId = getReqId(this.reqId);
+  }
+
+  private async rotateCookie() {
+    try {
+      const response = await axios.post(`${GOOGLE_ACCOUNT_HOST}/RotateCookies`, 
+        {
+          headers: {
+            Cookie: this.cookie,
+            'Content-Type': 'application/json',
+          },
+          params: [658, "-9999200007777"],
+        }
+      );
+
+      if (response) {
+        this.updateCookie(response.headers['set-cookie']);
+      }
+    } catch (err) {
+      logger.error(err);
+    }
   }
 
 }

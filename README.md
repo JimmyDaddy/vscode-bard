@@ -40,6 +40,10 @@ This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) ex
 
   <img src="./assets/getcookie2.png" alt="Example Image" width="450">
 
-> ***Due to Google's security policy, different regions may require different cookies. You can try setting all cookies starting with __Secure-1, or copy the entire cookie value as in Solution 2***.
+> **Note:**
+>
+> * ***Remember to close the opened bard webpage after getting the cookie.***
+>
+> * ***Due to Google's security policy, different regions may require different cookies. You can try setting all cookies starting with __Secure-1, or copy the entire cookie value as in Solution 2***.
 
 **Enjoy!**
