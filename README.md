@@ -1,11 +1,11 @@
-# <img src="/assets/bard.png" alt="Example Image" width="40" style="display: inline"> Google Bard (beta) vscode extension
+# <a href="https://bard.google.com/"><img src="/assets/bard.png" alt="Example Image" width="40" style="display: inline"></a>Google Bard (beta) vscode extension
 
 
 This is a vs code extension for [Google Bard(beta)](https://bard.google.com/) extension
 
 ## Features
 
-* Chat with google bard(beta) in vscode
+* Chat with [Google bard(beta)](https://bard.google.com/) in vscode
 * Multiple answers for one question
 
   <p style='display:flex; align-items: flex-start'>
