@@ -101,9 +101,14 @@ function Conversation(props: {
           </div>
         </div>
         <div className={styles.content}>
-          <ReactMarkdown>
-            {curData.ask || ''}
-          </ReactMarkdown>
+          <ReactMarkdown
+            children={`${curData.ask || ''}`}
+            components={{
+              code(props) {
+                return <CodeBlock {...props }/>;
+              }
+            }}
+          />
         </div>
       </div>
       <div className={styles.contentContainer}>

@@ -203,7 +203,7 @@ function App() {
       <div className={styles.inputContainer}>
         <Input 
           id="message"
-          placeholder="Ask bard here"
+          placeholder={loading ? "loading..." : "Ask bard here" }
           onChange={onChange}
           className={styles.input}
           defaultValue={message}
@@ -214,7 +214,7 @@ function App() {
         />
         <IconButton onClick={onCLick} disabled={loading} >
           {
-            loading ? <CircularProgress size={24} color='inherit'/> : <SendIcon />
+            loading ? <CircularProgress size={18} color='inherit'/> : <SendIcon />
           }
         </IconButton>
       </div>
