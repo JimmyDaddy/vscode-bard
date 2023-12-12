@@ -1,5 +1,12 @@
 
 
+## [0.0.11](https://github.com/JimmyDaddy/vscode-bard/compare/v0.0.10...v0.0.11) (2023-12-12)
+
+
+### Bug Fixes
+
+* Fixed height of Bard chat input fix [#12](https://github.com/JimmyDaddy/vscode-bard/issues/12) ([b8024f5](https://github.com/JimmyDaddy/vscode-bard/commit/b8024f54a702d4c99b66c71dd77c5ddf1c9db875))
+
 ## [0.0.10](https://github.com/JimmyDaddy/vscode-bard/compare/v0.0.9...v0.0.10) (2023-09-21)
 
 
