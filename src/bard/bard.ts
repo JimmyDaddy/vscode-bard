@@ -7,7 +7,7 @@ import vm from 'vm';
 import setCookieParser from 'set-cookie-parser';
 
 import logger from "../isomorphic/logger";
-import { uid, getReqId } from '../isomorphic/utils';
+import { uid } from '../isomorphic/utils';
 import { DEFAULT_RESPONSE_MESSAGE, DEFAULT_RESPONSE_MESSAGE_SNlM0E, BARD_HOST, GOOGLE_ACCOUNT_HOST } from "../isomorphic/consts";
 import { sleep } from "./utils";
 
@@ -17,7 +17,6 @@ export default class Bard {
   public locale: string = 'en';
   private at: string = '';
   private bl: string = '';
-  private reqId: number = getReqId();
   private conversationData: {
     c?: string;
     r?: string;
@@ -26,7 +25,6 @@ export default class Bard {
     messages?: BardMessage[];
     rpcids?: string;
   } = {};
-  private atConsumeCount: number = 0;
 
   private context: vscode.ExtensionContext;
 
@@ -45,6 +43,7 @@ export default class Bard {
 				"Sec-Fetch-Site": "none",
 				"Sec-Fetch-User": "?1",
 				TE: "trailers",
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
       }
     });
 
@@ -129,7 +128,6 @@ export default class Bard {
     if (locale) {
       this.locale = locale;
     }
-    this.atConsumeCount = 0;
   }
 
   private parseResponse(text: string, defaultPrompt?: string) {
@@ -173,7 +171,7 @@ export default class Bard {
   }
 
   private async requestBard(params: any, message: BardUserPrompt) {
-    const response = await axios.post(`${BARD_HOST}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate`, 
+    const response = await this.axios.post(`${BARD_HOST}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?bl=boq_assistant-bard-web-server_20230713.13_p0&_reqid=98765&rt=c`, 
       new URLSearchParams({
         at: this.at,
         "f.req": JSON.stringify([null, `[[${JSON.stringify(message.prompt)}],null,${JSON.stringify([this.conversationData.c || '', this.conversationData.r || '', message.rc || ''])}]`]),
@@ -181,8 +179,11 @@ export default class Bard {
       {
         headers: {
           Cookie: this.cookie,
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          "Accept-Encoding": "gzip, deflate, br"
         },
         params,
+        withCredentials: true,
       }
     );
 
@@ -225,6 +226,43 @@ export default class Bard {
     return obj;
   }
 
+  private async halo(halo: string = 'halo bard') {
+    try {
+      await this.getVerifyParams();
+      const params: any = {
+        bl: this.bl,
+        rt: "c",
+      };
+      if (this.conversationData.rpcids) {
+        params.rpcids = this.conversationData.rpcids;
+      }
+
+      let parsedResponse;
+      let retry = 0;
+      do {
+        try {
+          parsedResponse = await this.requestBard(params, {
+            prompt: halo,
+          });
+        } catch (error) {
+          logger.debug(retry, parsedResponse, 'retry');
+          logger.error(error);
+          if (retry >= 5) {
+            throw error;
+          }
+          await sleep(200);
+        }
+        retry++;
+      } while (!parsedResponse && retry < 2);
+      this.conversationData.c = parsedResponse?.c;
+      this.conversationData.r = parsedResponse?.r;
+
+      logger.debug(parsedResponse, 'halo parsedResponse');
+    } catch (error: any) {
+      logger.error('failed to get bard answers: ', error);
+    }
+  }
+
   public async ask(message: BardUserPrompt) {
     logger.debug(message, 'ask');
 
@@ -242,16 +280,15 @@ export default class Bard {
       curMessage = this.conversationData.messages.find((msg) => msg.uid === message.uid) || curMessage;
     }
 
-    logger.debug(this.at, this.bl, this.reqId, 'init ask data');
+    logger.debug(this.at, this.bl, 'init ask data');
 
     try {
-      if (!this.at || !this.bl || this.atConsumeCount >= 10) {
+      if (!this.at || !this.bl) {
         await this.getVerifyParams();
       }
       const params: any = {
         bl: this.bl,
         rt: "c",
-        _reqid: `${this.reqId}`,
       };
       if (this.conversationData.rpcids) {
         params.rpcids = this.conversationData.rpcids;
@@ -268,10 +305,13 @@ export default class Bard {
           if (retry >= 5) {
             throw error;
           }
-          await sleep(200);
+        }
+        await sleep(200);
+        if (!parsedResponse && retry === 4) {
+          await this.halo();
+          params.bl = this.bl;
         }
         retry++;
-        this.atConsumeCount += 1;
       } while (!parsedResponse && retry < 5);
       this.conversationData.c = parsedResponse?.c;
       this.conversationData.r = parsedResponse?.r;
@@ -282,7 +322,6 @@ export default class Bard {
         prompt: message.prompt,
         rc: message.rc || '',
       }];
-      this.updateReqId();
     } catch (error: any) {
       logger.error('failed to get bard answers: ', error);
       this.showBardError(error);
@@ -300,30 +339,6 @@ export default class Bard {
     }
     this.saveData();
     return curMessage;
-  }
-
-  private updateReqId() {
-    this.reqId = getReqId(this.reqId);
-  }
-
-  private async rotateCookie() {
-    try {
-      const response = await axios.post(`${GOOGLE_ACCOUNT_HOST}/RotateCookies`, 
-        {
-          headers: {
-            Cookie: this.cookie,
-            'Content-Type': 'application/json',
-          },
-          params: [658, "-9999200007777"],
-        }
-      );
-
-      if (response) {
-        this.updateCookie(response.headers['set-cookie']);
-      }
-    } catch (err) {
-      logger.error(err);
-    }
   }
 
 }

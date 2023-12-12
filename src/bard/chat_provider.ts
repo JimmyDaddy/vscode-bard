@@ -36,7 +36,6 @@ export default class ChatProvider implements vscode.WebviewViewProvider {
         if (event.affectsConfiguration('vscode-bard.cookie')) {
           const config = vscode.workspace.getConfiguration('vscode-bard');
           const cookies = config.get('cookie') as string;
-          logger.info('set cookie');
           await this.bot.setCookies(cookies);
         }
       })
